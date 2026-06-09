@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
+import AuthLayout from "../../../shared/components/AuthLayout";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signIn, user, profileLoaded, error } = useAuth();
   const navigate = useNavigate();
 
-  // Navegar solo cuando el profile este cargado (race condition fix)
   useEffect(() => {
     if (user && profileLoaded) {
       navigate("/");
@@ -23,41 +25,55 @@ export default function Login() {
     if (!result.success) {
       setIsSubmitting(false);
     }
-    // Si fue exitoso, el useEffect se encarga de navegar cuando profile este listo
   };
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <div className="auth-card">
         <h1>Iniciar Sesión</h1>
-        <p className="auth-subtitle">SENA Bienestar — Acceso institucional</p>
+        <p className="auth-subtitle">Accede a tu cuenta del sistema</p>
 
         {error && <div className="auth-error">{error}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="login-email">Email</label>
-            <input
-              id="login-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <div className="password-field">
+              <input
+                id="login-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="tu.email@soy.sena.edu.co"
+              />
+            </div>
           </div>
 
           <div className="field">
             <label htmlFor="login-password">Contraseña</label>
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="password-field">
+              <input
+                id="login-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Tu contraseña"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="btn-primary" disabled={isSubmitting}>
+            <LogIn size={18} />
             {isSubmitting ? (user && !profileLoaded ? "Redirigiendo..." : "Entrando...") : "Entrar"}
           </button>
         </form>
@@ -69,6 +85,6 @@ export default function Login() {
           </Link>
         </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

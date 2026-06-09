@@ -16,9 +16,15 @@ const AprendizDashboard = lazy(
   () => import("../features/appointments/pages/AprendizDashboard"),
 );
 
-// Privadas - Profesional
-const ProfessionalDashboard = lazy(
-  () => import("../features/appointments/pages/ProfessionalDashboard"),
+// Privadas - Profesionales (por dependencia)
+const PsychologyDashboard = lazy(
+  () => import("../features/appointments/pages/PsychologyDashboard"),
+);
+const NursingDashboard = lazy(
+  () => import("../features/appointments/pages/NursingDashboard"),
+);
+const SocialWorkDashboard = lazy(
+  () => import("../features/appointments/pages/SocialWorkDashboard"),
 );
 
 // Privadas - Coordinación
@@ -32,7 +38,10 @@ const AdminDashboard = lazy(
 );
 
 function HomeRedirect() {
-  const { user, profile, loading, profileLoaded, isAdmin, isCoordination, isProfessional } = useAuth();
+  const {
+    user, profile, loading, profileLoaded,
+    isAdmin, isCoordination, isPsicologia, isEnfermeria, isTrabajoSocial,
+  } = useAuth();
 
   if (loading && !user) {
     return (
@@ -54,13 +63,11 @@ function HomeRedirect() {
     return <Navigate to="/login" replace />;
   }
 
-  if (!profile) {
-    return <Navigate to="/login" replace />;
-  }
-
   if (isAdmin()) return <Navigate to="/admin" replace />;
   if (isCoordination()) return <Navigate to="/coordination" replace />;
-  if (isProfessional()) return <Navigate to="/professional" replace />;
+  if (isPsicologia()) return <Navigate to="/psychology" replace />;
+  if (isEnfermeria()) return <Navigate to="/nursing" replace />;
+  if (isTrabajoSocial()) return <Navigate to="/social-work" replace />;
   return <Navigate to="/dashboard" replace />;
 }
 
@@ -83,14 +90,32 @@ export function AppRoutes() {
           }
         />
 
-        {/* RUTAS PROTEGIDAS - PROFESIONALES */}
+        {/* RUTAS PROTEGIDAS - PSICOLOGÍA */}
         <Route
-          path="/professional"
+          path="/psychology"
           element={
-            <ProtectedRoute
-              requiredRoles={["PSICOLOGIA", "ENFERMERIA", "TRABAJO_SOCIAL"]}
-            >
-              <ProfessionalDashboard />
+            <ProtectedRoute requiredRoles="PSICOLOGIA">
+              <PsychologyDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS PROTEGIDAS - ENFERMERÍA */}
+        <Route
+          path="/nursing"
+          element={
+            <ProtectedRoute requiredRoles="ENFERMERIA">
+              <NursingDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* RUTAS PROTEGIDAS - TRABAJO SOCIAL */}
+        <Route
+          path="/social-work"
+          element={
+            <ProtectedRoute requiredRoles="TRABAJO_SOCIAL">
+              <SocialWorkDashboard />
             </ProtectedRoute>
           }
         />
@@ -115,7 +140,7 @@ export function AppRoutes() {
           }
         />
 
-        {/* REDIRECCIÓN INICIAL - Sin delay para no logueados, por rol si autenticado */}
+        {/* REDIRECCIÓN INICIAL */}
         <Route path="/" element={<HomeRedirect />} />
 
         {/* 404 */}
@@ -123,5 +148,4 @@ export function AppRoutes() {
       </Routes>
     </Suspense>
   );
-
 }

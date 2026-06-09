@@ -3,20 +3,23 @@ import { useAppointments } from "../hooks/useAppointments";
 import { AppointmentCard } from "../components/AppointmentCard";
 import { useAuth } from "../../../providers/AuthProvider";
 import {
-  Calendar, Clock, CheckCircle, AlertCircle, LogOut,
+  Calendar, Clock, CheckCircle, AlertCircle,
   TrendingUp, XCircle, FileText,
   ChevronDown, ChevronUp,
 } from "lucide-react";
+import UserAvatar from "../../../shared/components/UserAvatar";
+import UserSidebar from "../../../shared/components/UserSidebar";
 
 export function ProfessionalDashboard() {
   const {
     appointments, fetchAppointments, fetchAppointmentsSilent,
     updateStatus, isLoading,
   } = useAppointments();
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
   const [filter, setFilter] = useState("pending");
   const [notes, setNotes] = useState("");
   const [expandedCard, setExpandedCard] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchAppointmentsSilent({ status: filter });
@@ -70,10 +73,7 @@ export function ProfessionalDashboard() {
           <p>{profName} — Gestión de citas de bienestar</p>
         </div>
         <div className="header-actions">
-          <button onClick={signOut} className="btn-secondary">
-            <LogOut size={18} />
-            Salir
-          </button>
+          <UserAvatar name={profile?.full_name} onClick={() => setSidebarOpen(true)} />
         </div>
       </header>
 
@@ -286,6 +286,12 @@ export function ProfessionalDashboard() {
           ))
         )}
       </div>
+
+      <UserSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        appointments={appointments}
+      />
     </div>
   );
 }

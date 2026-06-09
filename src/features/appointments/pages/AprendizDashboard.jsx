@@ -3,13 +3,16 @@ import { useAppointments } from "../hooks/useAppointments";
 import { AppointmentForm } from "../components/AppointmentForm";
 import { AppointmentCard } from "../components/AppointmentCard";
 import { useAuth } from "../../../providers/AuthProvider";
-import { Plus, LogOut } from "lucide-react";
+import { Plus } from "lucide-react";
+import UserAvatar from "../../../shared/components/UserAvatar";
+import UserSidebar from "../../../shared/components/UserSidebar";
 
 export default function AprendizDashboard() {
-  const { appointments, fetchAppointments, fetchAppointmentsSilent, cancelAppointment, isLoading } =
+  const { appointments, fetchAppointmentsSilent, cancelAppointment, isLoading } =
     useAppointments();
-  const { signOut } = useAuth();
+  const { profile } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchAppointmentsSilent();
@@ -24,10 +27,10 @@ export default function AprendizDashboard() {
             <Plus size={20} />
             Nueva Cita
           </button>
-          <button onClick={signOut} className="btn-secondary">
-            <LogOut size={18} />
-            Salir
-          </button>
+          <UserAvatar
+            name={profile?.full_name}
+            onClick={() => setSidebarOpen(true)}
+          />
         </div>
       </header>
 
@@ -68,6 +71,12 @@ export default function AprendizDashboard() {
           ))
         )}
       </section>
+
+      <UserSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        appointments={appointments}
+      />
     </div>
   );
 }

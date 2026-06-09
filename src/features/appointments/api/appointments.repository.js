@@ -22,7 +22,7 @@ export class AppointmentRepository {
   }
 
   // READ: Obtener citas según filtros (RLS se encarga de seguridad)
-  static async fetch({ userId, dependencyId, status, dateFrom, dateTo }) {
+  static async fetch({ userId, dependencyId, professionalId, status, dateFrom, dateTo }) {
     let query = supabase.from("appointments").select(`
         *,
         dependencies (name, color),
@@ -33,6 +33,7 @@ export class AppointmentRepository {
     // Filtros dinámicos
     if (userId) query = query.eq("user_id", userId);
     if (dependencyId) query = query.eq("dependency_id", dependencyId);
+    if (professionalId) query = query.eq("professional_id", professionalId);
     if (status) query = query.eq("status", status);
     if (dateFrom) query = query.gte("scheduled_date", dateFrom);
     if (dateTo) query = query.lte("scheduled_date", dateTo);
@@ -87,5 +88,27 @@ export class AppointmentRepository {
 
     if (error) throw error;
     return count;
+  }
+
+  // FETCH APPRENTICE HISTORY: Obtener historial de un aprendiz en una dependencia
+  static async fetchApprenticeHistory(userId, dependencyId) {
+    let query = supabase
+      .from("appointments")
+      .select(`
+        *,
+        dependencies (name, color),
+        profiles!user_id (full_name, document_number),
+        professional:profiles!professional_id (full_name)
+      `)
+      .eq("user_id", userId);
+
+    if (dependencyId) query = query.eq("dependency_id", dependencyId);
+
+    const { data, error } = await query
+      .order("scheduled_date", { ascending: false })
+      .order("scheduled_time", { ascending: false });
+
+    if (error) throw new Error(`Error fetching historial: ${error.message}`);
+    return data || [];
   }
 }

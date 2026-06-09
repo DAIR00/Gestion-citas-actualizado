@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../../../lib/supabase";
+import { User, FileText, Briefcase, Mail, Lock, Eye, EyeOff, UserPlus } from "lucide-react";
+import AuthLayout from "../../../shared/components/AuthLayout";
 
 const ROLES = [
   { id: 2, name: "COORDINACION", label: "Coordinador de Bienestar" },
@@ -22,6 +24,8 @@ export default function Register() {
     roleId: "",
     dependencyId: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [dependencies, setDependencies] = useState([]);
   const [validationError, setValidationError] = useState("");
 
@@ -99,16 +103,20 @@ export default function Register() {
   const errorMessage = validationError || authError;
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <div className="auth-card register-card">
         <h1>Crear cuenta</h1>
         <p className="auth-subtitle">
-          SENA Bienestar — Regístrate para acceder al sistema
+          Regístrate para acceder al sistema
         </p>
 
         {errorMessage && <div className="auth-error">{errorMessage}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          <span className="auth-section-title">
+            <User size={14} /> Información personal
+          </span>
+
           <div className="field">
             <label htmlFor="reg-fullname">Nombre completo</label>
             <input
@@ -134,6 +142,10 @@ export default function Register() {
               placeholder="Ej: 1234567890"
             />
           </div>
+
+          <span className="auth-section-title">
+            <Briefcase size={14} /> Rol y dependencia
+          </span>
 
           <div className="field">
             <label htmlFor="reg-role">Rol</label>
@@ -164,10 +176,10 @@ export default function Register() {
                 required
               >
                 <option value="">
-                {dependencies.length === 0
-                  ? "No hay dependencias disponibles"
-                  : "Selecciona una dependencia"}
-              </option>
+                  {dependencies.length === 0
+                    ? "No hay dependencias disponibles"
+                    : "Selecciona una dependencia"}
+                </option>
                 {dependencies.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -176,6 +188,10 @@ export default function Register() {
               </select>
             </div>
           )}
+
+          <span className="auth-section-title">
+            <Mail size={14} /> Credenciales
+          </span>
 
           <div className="field">
             <label htmlFor="reg-email">Email institucional</label>
@@ -192,31 +208,52 @@ export default function Register() {
 
           <div className="field">
             <label htmlFor="reg-password">Contraseña</label>
-            <input
-              id="reg-password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Mínimo 6 caracteres"
-            />
+            <div className="password-field">
+              <input
+                id="reg-password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Mínimo 6 caracteres"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <div className="field">
             <label htmlFor="reg-confirm">Confirmar contraseña</label>
-            <input
-              id="reg-confirm"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              placeholder="Repite tu contraseña"
-            />
+            <div className="password-field">
+              <input
+                id="reg-confirm"
+                type={showConfirm ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                placeholder="Repite tu contraseña"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirm(!showConfirm)}
+                tabIndex={-1}
+              >
+                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="btn-primary">
+            <UserPlus size={18} />
             Crear cuenta
           </button>
         </form>
@@ -228,6 +265,6 @@ export default function Register() {
           </Link>
         </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

@@ -1,12 +1,15 @@
 @import "./variables.css";
+@import "./user-sidebar.css";
 @import "./buttons.css";
 @import "./layout.css";
+@import "./auth-layout.css";
 @import "./auth.css";
 @import "./appointments.css";
 @import "./admin.css";
 @import "./dashboard.css";
+@import "./professional.css";
 
-* {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -14,17 +17,86 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--sena-gray);
-  color: var(--sena-dark);
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--bg-root);
+  background-image:
+    radial-gradient(at 10% 90%, rgba(57, 169, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(at 90% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(13, 148, 136, 0.03) 0%, transparent 60%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+::selection {
+  background: rgba(57, 169, 0, 0.15);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(57, 169, 0, 0.15);
+  color: var(--text-primary);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c5cad3;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a8b3;
+}
+
+a {
+  color: var(--sena-green);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-smooth);
+}
+
+a:hover {
+  color: var(--sena-green-dark);
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

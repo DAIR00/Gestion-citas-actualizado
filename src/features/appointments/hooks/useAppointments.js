@@ -25,7 +25,6 @@ export function useAppointments() {
       setError(null);
 
       try {
-        // RBAC implícito: los filtros dependen del rol
         const roleFilters = isAprendiz()
           ? { userId: user.id }
           : { dependencyId: profile.dependency_id };
@@ -72,12 +71,41 @@ export function useAppointments() {
     [user, profile, isAprendiz],
   );
 
+  // FETCH POR PROFESIONAL: Citas de la dependencia del profesional
+  const fetchMyAppointments = async (filters = {}) => {
+    if (!profile?.dependency_id) return [];
+    setError(null);
+
+    try {
+      const data = await AppointmentRepository.fetch({
+        dependencyId: profile.dependency_id,
+        ...filters,
+      });
+      setAppointments(data);
+      return data;
+    } catch (err) {
+      setError(err.message);
+      toast.error("Error cargando citas");
+      return [];
+    }
+  };
+
+  // FETCH HISTORIAL APRENDIZ: Citas previas de un aprendiz en una dependencia
+  const fetchApprenticeHistory = useCallback(async (userId, dependencyId) => {
+    try {
+      const data = await AppointmentRepository.fetchApprenticeHistory(userId, dependencyId);
+      return data;
+    } catch (err) {
+      toast.error("Error cargando historial");
+      return [];
+    }
+  }, []);
+
   // CREATE: Crear cita con validaciones de negocio
   const createAppointment = async (formData) => {
     setStatus(STATUS.CREATING);
 
     try {
-      // Regla de negocio: Máximo 2 citas pendientes
       if (isAprendiz()) {
         const pendingCount = await AppointmentRepository.countPending(user.id);
         if (pendingCount >= 2) {
@@ -87,7 +115,6 @@ export function useAppointments() {
         }
       }
 
-      // Verificar disponibilidad de horario
       const isAvailable = await AppointmentRepository.checkAvailability(
         formData.dependency_id,
         formData.scheduled_date,
@@ -98,20 +125,39 @@ export function useAppointments() {
         throw new Error("Este horario ya está ocupado. Selecciona otro.");
       }
 
-      // Crear la cita
       const newAppointment = await AppointmentRepository.create({
         ...formData,
         user_id: user.id,
         status: "pending",
       });
 
-      // OPTIMISTIC UPDATE: Actualizamos UI inmediatamente
       setAppointments((prev) => [...prev, newAppointment]);
       toast.success("Cita agendada correctamente");
       return { success: true, data: newAppointment };
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
+      return { success: false, error: err.message };
+    } finally {
+      setStatus(STATUS.IDLE);
+    }
+  };
+
+  // UPDATE: Actualizar cita completa (estado + campos específicos)
+  const updateAppointment = async (appointmentId, updates) => {
+    setStatus(STATUS.UPDATING);
+
+    try {
+      const updated = await AppointmentRepository.update(appointmentId, updates);
+
+      setAppointments((prev) =>
+        prev.map((app) => (app.id === appointmentId ? updated : app)),
+      );
+
+      toast.success("Cita actualizada");
+      return { success: true, data: updated };
+    } catch (err) {
+      toast.error("Error actualizando cita");
       return { success: false, error: err.message };
     } finally {
       setStatus(STATUS.IDLE);
@@ -131,7 +177,6 @@ export function useAppointments() {
         updates,
       );
 
-      // Actualizar estado local sin recargar todo
       setAppointments((prev) =>
         prev.map((app) => (app.id === appointmentId ? updated : app)),
       );
@@ -168,7 +213,10 @@ export function useAppointments() {
     isCreating: status === STATUS.CREATING,
     fetchAppointments,
     fetchAppointmentsSilent,
+    fetchMyAppointments,
+    fetchApprenticeHistory,
     createAppointment,
+    updateAppointment,
     updateStatus,
     cancelAppointment,
   };

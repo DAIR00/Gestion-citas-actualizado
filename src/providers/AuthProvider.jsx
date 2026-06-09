@@ -165,12 +165,14 @@ export function AuthProvider({ children }) {
   };
 
   //SISTEMA RBAC: helper functions para verificar permisos
+  const normalizeRole = (str) => str?.toUpperCase().replace(/\s+/g, "_").trim();
   const hasRole = (requiredRoles) => {
     if (!profile?.roles?.name) return false;
+    const userRole = normalizeRole(profile.roles.name);
     if (Array.isArray(requiredRoles)) {
-      return requiredRoles.includes(profile.roles.name);
+      return requiredRoles.some((r) => normalizeRole(r) === userRole);
     }
-    return profile.roles.name === requiredRoles;
+    return normalizeRole(requiredRoles) === userRole;
   };
 
   const isAdmin = () => hasRole("SUPERADMIN");
@@ -178,6 +180,9 @@ export function AuthProvider({ children }) {
   const isProfessional = () =>
     hasRole(["PSICOLOGIA", "ENFERMERIA", "TRABAJO_SOCIAL"]);
   const isAprendiz = () => hasRole("APRENDIZ");
+  const isPsicologia = () => hasRole("PSICOLOGIA");
+  const isEnfermeria = () => hasRole("ENFERMERIA");
+  const isTrabajoSocial = () => hasRole("TRABAJO_SOCIAL");
 
   const value = {
     user,
@@ -193,6 +198,9 @@ export function AuthProvider({ children }) {
     isCoordination,
     isProfessional,
     isAprendiz,
+    isPsicologia,
+    isEnfermeria,
+    isTrabajoSocial,
   };
 
   return (

@@ -1,37 +1,45 @@
-/* ===========================
-   Campos de formulario
-   =========================== */
+/* ========================================
+   APPOINTMENTS — Cards, Forms, Reports
+   ======================================== */
+
+/* ── Form Fields ── */
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .field label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .field input,
 .field select,
 .field textarea {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-family: inherit;
-  color: #374151;
+  color: var(--text-primary);
+  background: var(--bg-card);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-normal) var(--ease-smooth),
+    background var(--duration-fast) var(--ease-smooth);
 }
 
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
   border-color: var(--sena-green);
-  box-shadow: 0 0 0 2px rgba(57, 169, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.08);
+  background: var(--sena-green-50);
 }
 
 .field textarea {
@@ -46,19 +54,18 @@
 }
 
 .error {
-  font-size: 0.75rem;
-  color: #ef4444;
+  font-size: 0.72rem;
+  color: var(--color-error);
   margin-top: 0.15rem;
+  font-weight: 500;
 }
 
-/* ===========================
-   Formulario de citas
-   =========================== */
+/* ── Appointment Form ── */
 
 .appointment-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.1rem;
 }
 
 .appointment-form .field-row {
@@ -67,9 +74,7 @@
   gap: 1rem;
 }
 
-/* ===========================
-   Lista de citas
-   =========================== */
+/* ── Appointment List ── */
 
 .appointments-list {
   display: flex;
@@ -77,40 +82,43 @@
   gap: 1rem;
 }
 
-/* ===========================
-   Tarjeta de cita
-   =========================== */
+/* ── Appointment Card ── */
 
 .appointment-card {
-  background: white;
-  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
   padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-normal) var(--ease-smooth);
 }
 
 .appointment-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 .dependency-badge {
-  display: inline-block;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  font-size: 0.68rem;
   font-weight: 600;
   color: white;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
 .status-badge {
@@ -119,54 +127,60 @@
   gap: 0.3rem;
   font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .card-datetime {
   display: flex;
   gap: 1.25rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
   flex-wrap: wrap;
 }
 
 .datetime-item {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   font-size: 0.85rem;
-  color: #374151;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .datetime-item svg {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .card-body {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .card-body .reason {
-  font-size: 0.85rem;
-  color: #374151;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.55;
   margin-bottom: 0.5rem;
 }
 
 .aprendiz-info {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.8rem;
-  color: #6b7280;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.aprendiz-info svg {
+  color: var(--text-muted);
 }
 
 .card-actions {
-  padding-top: 0.75rem;
-  border-top: 1px solid #f3f4f6;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-light);
 }
 
-/* ===========================
-   Grid de citas (profesional)
-   =========================== */
+/* ── Appointments Grid (Professional) ── */
 
 .appointments-grid {
   display: flex;
@@ -195,74 +209,75 @@
 
 .completion-notes {
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
   font-family: inherit;
-  color: #374151;
+  color: var(--text-primary);
+  background: var(--bg-card);
   resize: vertical;
   min-height: 60px;
+  transition:
+    border-color var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-normal) var(--ease-smooth);
 }
 
 .completion-notes:focus {
   outline: none;
   border-color: var(--sena-green);
-  box-shadow: 0 0 0 2px rgba(57, 169, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.08);
 }
 
-/* ===========================
-   Filtros de tabs
-   =========================== */
+/* ── Filter Tabs ── */
 
 .filter-tabs {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
 .filter-tabs button {
   padding: 0.5rem 1rem;
-  background: none;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-full);
   font-size: 0.8rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .filter-tabs button:hover {
-  background: #f9fafb;
-  color: #374151;
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  border-color: var(--border-default);
 }
 
 .filter-tabs button.active {
-  background: var(--sena-green);
+  background: var(--gradient-brand);
   color: white;
-  border-color: var(--sena-green);
+  border-color: transparent;
+  box-shadow: var(--shadow-green);
 }
 
-/* ===========================
-   Tabs de coordinación
-   =========================== */
+/* ── Coordination Tabs ── */
 
 .coordination-tabs {
   display: flex;
-  gap: 0.25rem;
-  border-bottom: 2px solid #e5e7eb;
+  gap: 0.35rem;
+  border-bottom: 2px solid var(--border-light);
   margin-bottom: 1.5rem;
 }
 
-/* ===========================
-   Reportes
-   =========================== */
+/* ── Reports ── */
 
 .report-generator {
-  background: white;
-  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .report-header {
@@ -277,13 +292,14 @@
 .report-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .report-title h2 {
+  font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--sena-dark);
+  color: var(--text-primary);
 }
 
 .report-title svg {
@@ -296,11 +312,11 @@
   flex-wrap: wrap;
 }
 
-/* Filtros de reporte */
+/* Report Filters */
 .report-filters {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
   padding: 1.25rem;
   margin-bottom: 1.25rem;
 }
@@ -318,11 +334,11 @@
   justify-content: flex-end;
 }
 
-/* Placeholder */
+/* Report Placeholder */
 .report-placeholder {
   text-align: center;
-  padding: 3rem 1rem;
-  color: #6b7280;
+  padding: 3.5rem 1rem;
+  color: var(--text-muted);
 }
 
 .report-placeholder p {
@@ -330,65 +346,74 @@
   font-size: 0.9rem;
 }
 
-/* Resumen del reporte */
+/* Report Summary */
 .report-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.85rem;
   margin-bottom: 1.5rem;
 }
 
 .summary-card {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
   padding: 1rem;
   text-align: center;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
 }
 
 .summary-card.success {
-  border-color: #bbf7d0;
-  background: #f0fdf4;
+  border-color: rgba(34, 197, 94, 0.2);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.06) 0%, rgba(34, 197, 94, 0.02) 100%);
 }
 
 .summary-card.info {
-  border-color: #bfdbfe;
-  background: #eff6ff;
+  border-color: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(59, 130, 246, 0.02) 100%);
 }
 
 .summary-card.warning {
-  border-color: #fde68a;
-  background: #fffbeb;
+  border-color: rgba(245, 158, 11, 0.2);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.06) 0%, rgba(245, 158, 11, 0.02) 100%);
 }
 
 .summary-card.danger {
-  border-color: #fecaca;
-  background: #fef2f2;
+  border-color: rgba(239, 68, 68, 0.2);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0%, rgba(239, 68, 68, 0.02) 100%);
 }
 
 .summary-value {
   display: block;
+  font-family: var(--font-mono);
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--sena-dark);
+  color: var(--text-primary);
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .summary-label {
   display: block;
-  font-size: 0.7rem;
-  color: #6b7280;
+  font-size: 0.68rem;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 0.25rem;
+  letter-spacing: 0.06em;
+  margin-top: 0.3rem;
+  font-weight: 600;
 }
 
-/* Tabla de reporte */
+/* Report Table */
 .report-table-container {
   overflow-x: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
   margin-bottom: 1rem;
+  background: var(--bg-card);
 }
 
 .report-table {
@@ -400,67 +425,68 @@
 .report-table th {
   text-align: left;
   padding: 0.75rem 1rem;
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
+  background: var(--bg-muted);
+  border-bottom: 2px solid var(--border-light);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.03em;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
 .report-table td {
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid #f3f4f6;
-  color: var(--sena-dark);
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+  transition: background var(--duration-fast) var(--ease-smooth);
 }
 
-.report-table tr:hover td {
-  background: #f9fafb;
+.report-table tbody tr:hover td {
+  background: rgba(57, 169, 0, 0.03);
 }
 
 .report-table .dep-badge {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
+  display: inline-flex;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-full);
   font-size: 0.65rem;
   font-weight: 600;
   color: white;
 }
 
 .report-table .status-badge {
-  display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
+  display: inline-flex;
+  padding: 0.18rem 0.55rem;
+  border-radius: var(--radius-full);
   font-size: 0.65rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .report-table .status-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.1);
+  color: #b45309;
 }
 
 .report-table .status-confirmed {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
 }
 
 .report-table .status-completed {
-  background: #dcfce7;
-  color: #166534;
+  background: rgba(34, 197, 94, 0.1);
+  color: #15803d;
 }
 
 .report-table .status-cancelled {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
 }
 
 .report-table .status-no_show {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
 }
 
 .reason-cell {
@@ -472,17 +498,17 @@
 
 .report-footer {
   text-align: right;
-  font-size: 0.8rem;
-  color: #6b7280;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
 }
 
 /* ===========================
    Responsive
    =========================== */
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .field-row {
     grid-template-columns: 1fr;
   }
@@ -490,6 +516,11 @@
   .card-datetime {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .filters-grid {
@@ -503,5 +534,85 @@
   .report-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .report-actions {
+    width: 100%;
+  }
+
+  .report-actions .btn-primary,
+  .report-actions .btn-secondary {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .report-table {
+    font-size: 0.75rem;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .reason-cell {
+    max-width: 120px;
+  }
+
+  .filter-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .coordination-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .report-summary {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1441px) {
+  .appointment-card {
+    padding: 1.5rem;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .report-summary {
+    gap: 1rem;
+  }
+
+  .summary-value {
+    font-size: 1.75rem;
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+  }
+
+  .filters-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }

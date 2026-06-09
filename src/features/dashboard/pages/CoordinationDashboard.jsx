@@ -6,7 +6,9 @@ import { DependencyChart } from "../components/DependencyChart";
 import { MonthlyTrendChart } from "../components/MonthlyTrendChart";
 import { ProfessionalTable } from "../components/ProfessionalTable";
 import { ReportGenerator } from "../../appointments/components/ReportGenerator";
-import { Download, RefreshCw, Calendar, FileBarChart, LogOut } from "lucide-react";
+import { Download, RefreshCw, Calendar, FileBarChart } from "lucide-react";
+import UserAvatar from "../../../shared/components/UserAvatar";
+import UserSidebar from "../../../shared/components/UserSidebar";
 import { format, subMonths } from "date-fns";
 
 export default function CoordinationDashboard() {
@@ -19,12 +21,13 @@ export default function CoordinationDashboard() {
         fetchAllMetrics,
         exportToCSV, 
     } = useDashboard();
-    const { signOut } = useAuth();
+    const { profile } = useAuth();
     const [dataRange, setDataRange] = useState({
         from: format(subMonths(new Date(), 1), "yyyy-MM-dd"),
         to: format(new Date(), "yyyy-MM-dd"),
     });
     const [activeTab, setActiveTab] = useState("dashboard");
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         fetchAllMetrics(dataRange);
@@ -58,10 +61,7 @@ export default function CoordinationDashboard() {
                 </button>
               </>
             )}
-            <button onClick={signOut} className="btn-secondary">
-              <LogOut size={18} />
-              Salir
-            </button>
+            <UserAvatar name={profile?.full_name} onClick={() => setSidebarOpen(true)} />
           </div>
         </header>
 
@@ -142,6 +142,11 @@ export default function CoordinationDashboard() {
         {activeTab === "reports" && (
           <ReportGenerator title="Reporte de Citas - Coordinación" variant="full" />
         )}
+
+        <UserSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
       </div>
     )
   }
