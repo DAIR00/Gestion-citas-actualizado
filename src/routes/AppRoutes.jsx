@@ -31,17 +31,40 @@ const AdminDashboard = lazy(
   () => import("../features/admin/pages/AdminDashboard"),
 );
 
+function HomeRedirect() {
+  const { user, profile, loading, profileLoaded, isAdmin, isCoordination, isProfessional } = useAuth();
+
+  if (loading && !user) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <p>Cargando...</p>
+      </div>
+    );
+  }
+
+  if (loading && user && !profileLoaded) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <p>Cargando perfil...</p>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!profile) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (isAdmin()) return <Navigate to="/admin" replace />;
+  if (isCoordination()) return <Navigate to="/coordination" replace />;
+  if (isProfessional()) return <Navigate to="/professional" replace />;
+  return <Navigate to="/dashboard" replace />;
+}
+
 export function AppRoutes() {
-  const { isAprendiz, isProfessional, isCoordination, isAdmin } = useAuth();
-
-  // Redirección inteligente según rol (después del login)
-  const getHomeRoute = () => {
-    if (isAdmin()) return "/admin";
-    if (isCoordination()) return "/coordination";
-    if (isProfessional()) return "/professional";
-    return "/dashboard"; // Aprendiz por defecto
-  };
-
   return (
     <Suspense fallback={<div>Cargando...</div>}>
       <Routes>
@@ -92,8 +115,8 @@ export function AppRoutes() {
           }
         />
 
-        {/* REDIRECCIÓN INICIAL */}
-        <Route path="/" element={<Navigate to={getHomeRoute()} replace />} />
+        {/* REDIRECCIÓN INICIAL - Sin delay para no logueados, por rol si autenticado */}
+        <Route path="/" element={<HomeRedirect />} />
 
         {/* 404 */}
         <Route path="*" element={<div>404 - Página no encontrada</div>} />

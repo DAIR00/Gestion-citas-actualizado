@@ -3,9 +3,10 @@ import { useAdmin } from "../hooks/useAdmin";
 import { Clock, User, Database, ArrowRight } from "lucide-react";
 
 const ACTIONS_COLORS = {
-    CREATE_USER: "#22c5e",
+    CREATE_USER: "#22c55e",
     UPDATE_USER: "#3b82f6",
     DELETE_USER: "#f59e0b",
+    UPDATE_CONFIG: "#8b5cf6",
 };
 
 export function AuditLogViewer() {
@@ -17,7 +18,7 @@ export function AuditLogViewer() {
     }, [fetchAuditLogs]);
 
     const filteredLogs = filters
-        ? auditLogs.filter(l => l.action.includes(filter) || l.entity_type.includes(filters))
+        ? auditLogs.filter(l => l.action.includes(filters) || l.entity_type.includes(filters))
         : auditLogs;
 
     return (

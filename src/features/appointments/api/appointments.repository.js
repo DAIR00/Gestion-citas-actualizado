@@ -1,5 +1,4 @@
 import { supabase } from "../../../lib/supabase";
-import { addDays, isWeekend, format } from "date-fns";
 
 // CLASE Repository: encapsula todo el acceso a datos de citas
 // Principio SOLID: Dependency Inversion (dependemos de abstracciones)

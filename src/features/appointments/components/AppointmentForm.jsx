@@ -13,7 +13,6 @@ export function AppointmentForm({ onSuccess }) {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm({
     resolver: zodResolver(appointmentSchema),
     defaultValues: {

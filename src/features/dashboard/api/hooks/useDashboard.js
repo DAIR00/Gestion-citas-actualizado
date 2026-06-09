@@ -10,38 +10,39 @@ export const useDashboard = () => {
     const [professionals, setProfessionals] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const dateRange = {
+    const getDefaultRange = () => ({
         from: format(startOfMonth(new Date()), "yyyy-MM-dd"),
         to: format(endOfMonth(new Date()), "yyyy-MM-dd"),
-    };
+    });
 
     const fetchAllMetrics = useCallback(async (customRange = null) => {
         setLoading(true);
-        const range = customRange || dateRange;
+        const range = customRange || getDefaultRange();
 
-        try {
-            const [kpiData, depData, monthlyData, profData] = await Promise.all([
-                DashboardRepository.getKPIs(range),
-                DashboardRepository.getAppointmentsByDependency(range),
-                DashboardRepository.getMonthlyTrend(new Date().getFullYear()),
-                DashboardRepository.getProfessionalPerformance(range),
-            ]);
+        const results = await Promise.allSettled([
+            DashboardRepository.getKPI(range),
+            DashboardRepository.getAppointmentsByDependency(range),
+            DashboardRepository.getMonthlyEvolution(new Date().getFullYear()),
+            DashboardRepository.getProfessionalPerformance(range),
+        ]);
 
-            setKpis(kpiData[0]);
-            setByDependency(depData);
-            setMonthlyTrend(monthlyData);
-            setProfessionals(profData);
-        } catch (error) {
-            toast.error("Error cargando métricas");
-            console.error(error);
-        } finally {
-            setLoading(false);
+        if (results[0].status === "fulfilled") setKpis(results[0].value[0]);
+        if (results[1].status === "fulfilled") setByDependency(results[1].value);
+        if (results[2].status === "fulfilled") setMonthlyTrend(results[2].value);
+        if (results[3].status === "fulfilled") setProfessionals(results[3].value);
+
+        const failures = results.filter((r) => r.status === "rejected");
+        if (failures.length > 0) {
+            toast.error("Algunas métricas no se pudieron cargar");
+            console.error("Dashboard errors:", failures.map((f) => f.reason));
         }
+
+        setLoading(false);
     }, []);
 
     const exportToCSV = async (range) => {
         try {
-            const data = await DashboardRepository.getRawDataForExport(range || dateRange);
+            const data = await DashboardRepository.getRawDataForExport(range || getDefaultRange());
 
             const flatData = data.map((row) => ({
                 ID: row.id,
@@ -61,11 +62,14 @@ export const useDashboard = () => {
             const csv = [
                 headers.join(","),
                 ...flatData.map((row) =>
-                    headers.map((h) => `"${row[h] || ""}"`).join(",")
+                    headers.map((h) => {
+                        const val = String(row[h] || "").replace(/"/g, '""');
+                        return `"${val}"`;
+                    }).join(",")
                 ),
             ].join("\n");
 
-            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = `reporte_bienestar_${format(new Date(), "yyyy-MM-dd")}.csv`;

@@ -1,19 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../../providers/AuthProvider";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, error } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signIn, user, profileLoaded, error } = useAuth();
   const navigate = useNavigate();
+
+  // Navegar solo cuando el profile este cargado (race condition fix)
+  useEffect(() => {
+    if (user && profileLoaded) {
+      navigate("/");
+    }
+  }, [user, profileLoaded, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const result = await signIn(email, password);
-    if (result.success) {
-      navigate("/");
+    if (!result.success) {
+      setIsSubmitting(false);
     }
+    // Si fue exitoso, el useEffect se encarga de navegar cuando profile este listo
   };
 
   return (
@@ -47,8 +57,8 @@ export default function Login() {
             />
           </div>
 
-          <button type="submit" className="btn-primary">
-            Entrar
+          <button type="submit" className="btn-primary" disabled={isSubmitting}>
+            {isSubmitting ? (user && !profileLoaded ? "Redirigiendo..." : "Entrando...") : "Entrar"}
           </button>
         </form>
 

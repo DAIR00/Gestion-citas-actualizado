@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 dist
 .env
+opencode.jsonc
 dist-ssr
 *.local
 

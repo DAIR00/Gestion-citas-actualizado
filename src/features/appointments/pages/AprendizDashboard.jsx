@@ -2,25 +2,33 @@ import { useEffect, useState } from "react";
 import { useAppointments } from "../hooks/useAppointments";
 import { AppointmentForm } from "../components/AppointmentForm";
 import { AppointmentCard } from "../components/AppointmentCard";
-import { Plus } from "lucide-react";
+import { useAuth } from "../../../providers/AuthProvider";
+import { Plus, LogOut } from "lucide-react";
 
 export default function AprendizDashboard() {
-  const { appointments, fetchAppointments, cancelAppointment, isLoading } =
+  const { appointments, fetchAppointments, fetchAppointmentsSilent, cancelAppointment, isLoading } =
     useAppointments();
+  const { signOut } = useAuth();
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
+    fetchAppointmentsSilent();
+  }, [fetchAppointmentsSilent]);
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Mis Citas de Bienestar</h1>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus size={20} />
-          Nueva Cita
-        </button>
+        <div className="header-actions">
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <Plus size={20} />
+            Nueva Cita
+          </button>
+          <button onClick={signOut} className="btn-secondary">
+            <LogOut size={18} />
+            Salir
+          </button>
+        </div>
       </header>
 
       {showForm && (
@@ -30,7 +38,7 @@ export default function AprendizDashboard() {
             <AppointmentForm
               onSuccess={() => {
                 setShowForm(false);
-                fetchAppointments();
+                fetchAppointmentsSilent();
               }}
             />
           </div>
@@ -38,8 +46,10 @@ export default function AprendizDashboard() {
       )}
 
       <section className="appointments-list">
-        {isLoading ? (
-          <p>Cargando tus citas...</p>
+        {isLoading && appointments.length === 0 ? (
+          <div className="loading-screen">
+            <p>Cargando tus citas...</p>
+          </div>
         ) : appointments.length === 0 ? (
           <div className="empty-state">
             <p>No tienes citas agendadas</p>

@@ -3,7 +3,7 @@ import { supabase } from "../../../lib/supabase";
 export class AdminRepository {
     static async getUsers({ role, status, search, page = 1, limit = 20 }) {
         let query = supabase
-            .from("users")
+            .from("profiles")
             .select(
                 `
             *,
@@ -120,18 +120,18 @@ export class AdminRepository {
         if (error) throw error;
         return data.reduce((acc, item) => ({ ...acc, [item.key]: item.value }), {});
     }
-    static async updateConfig(updates, adminId) {
+    static async updateConfig(key, value, adminId) {
         const { data: oldConfig } = await supabase
             .from("system_config")
             .select("*")
             .eq("key", key)
             .single();
 
-        const { data, error} = await supabase
+        const { data, error } = await supabase
             .from("system_config")
             .update({
-                valur,
-                update_by: adminId,
+                value,
+                updated_by: adminId,
                 updated_at: new Date(),
             })
             .eq("key", key)
@@ -152,7 +152,6 @@ export class AdminRepository {
     }
 
     static async logAction({ userId, action, entitytype, entityId, oldData, newData }) {
-        const ip = null;
         const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : null;
 
         await supabase.from("audit_logs").insert({

@@ -47,6 +47,31 @@ export function useAppointments() {
     [user, profile, isAprendiz],
   );
 
+  // FETCH SILENCIOSO: Para cambios de filtro sin mostrar loading full-screen
+  const fetchAppointmentsSilent = useCallback(
+    async (filters = {}) => {
+      setError(null);
+
+      try {
+        const roleFilters = isAprendiz()
+          ? { userId: user.id }
+          : { dependencyId: profile.dependency_id };
+
+        const data = await AppointmentRepository.fetch({
+          ...roleFilters,
+          ...filters,
+        });
+        setAppointments(data);
+        return data;
+      } catch (err) {
+        setError(err.message);
+        toast.error("Error cargando citas");
+        return [];
+      }
+    },
+    [user, profile, isAprendiz],
+  );
+
   // CREATE: Crear cita con validaciones de negocio
   const createAppointment = async (formData) => {
     setStatus(STATUS.CREATING);
@@ -142,6 +167,7 @@ export function useAppointments() {
     isLoading: status === STATUS.FETCHING,
     isCreating: status === STATUS.CREATING,
     fetchAppointments,
+    fetchAppointmentsSilent,
     createAppointment,
     updateStatus,
     cancelAppointment,

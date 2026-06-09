@@ -1,8 +1,7 @@
-import { useState, useCallback, use } from "react";
+import { useState, useCallback } from "react";
 import { AdminRepository } from "../api/admin.repository";
 import { useAuth } from "../../../providers/AuthProvider";
 import { toast } from "sonner";
-import { set } from "date-fns";
 
 export function useAdmin() {
     const { user } = useAuth();
@@ -22,8 +21,8 @@ export function useAdmin() {
                 totalPages: result.totalPages, 
                 total: result.total 
             });
-        } catch (err) {
-            toast.error("Error al cargando los usuarios ");
+        } catch {
+            toast.error("Error al cargar los usuarios");
         } finally {
             setLoading(false);
         }
@@ -58,8 +57,8 @@ export function useAdmin() {
         try {
             const result = await AdminRepository.getAuditLogs(filters);
             setAuditLogs(result.logs);
-        } catch (err) {
-            toast.error("Error cargando auditoria");
+        } catch {
+            toast.error("Error cargando auditoría");
         } finally {
             setLoading(false);
         }
@@ -69,18 +68,18 @@ export function useAdmin() {
         try {
             const data = await AdminRepository.getConfig();
             setConfig(data);
-        } catch (err) {
+        } catch {
             toast.error("Error cargando configuración");
         }
     }, []);
 
-    const updateConfig = async (newConfig) => {
+    const updateConfig = async (key, value) => {
         try {
-            await AdminRepository.updateConfig(newConfig, user.id);
+            await AdminRepository.updateConfig(key, value, user.id);
             toast.success("Configuración actualizada");
             await fetchConfig();
         } catch (err) {
-            toast.error("err.message");
+            toast.error(err.message);
         }
     };
 

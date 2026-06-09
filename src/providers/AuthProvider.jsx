@@ -18,54 +18,51 @@ export const useAuth = () => {
 
 //3 El provider que envuelve la aplicacion
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); //usuario de Supabase Auth
-  const [profile, setProfile] = useState(null); //Datos adicionales de nuestra tabla de perfil o profiles
-  const [loading, setLoading] = useState(true); //Estado de cargar inicial
-  const [error, setError] = useState(null); //manejo o gestion de errores
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [error, setError] = useState(null);
 
-  //Efecto Escuchar cambios de sesion( login, logout, refresh)
   useEffect(() => {
-    //verificar sesion existente al cargar la app
-    const checkSession = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkSession();
-
-    //suscribirse a cambios de autenticacion (login/logout en tiempo real )
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === "SIGNED_IN" && session?.user) {
-          setUser(session.user);
-          await fetchProfile(session.user.id);
+        if (event === "INITIAL_SESSION") {
+          if (session?.user) {
+            setProfileLoaded(false);
+            setUser(session.user);
+            await fetchProfile(session.user.id, session.user);
+          } else {
+            setUser(null);
+            setProfile(null);
+            setProfileLoaded(true);
+          }
+          setInitialLoading(false);
+        } else if (event === "SIGNED_IN") {
+          if (session?.user) {
+            setProfileLoaded(false);
+            setUser(session.user);
+            await fetchProfile(session.user.id, session.user);
+          }
         } else if (event === "SIGNED_OUT") {
           setUser(null);
           setProfile(null);
+          setProfileLoaded(true);
         }
       },
     );
 
-    // limpieza de suscripcion al desmontar ( es buena practica)
     return () => {
       listener.subscription.unsubscribe();
     };
   }, []);
 
   //funcion auxiliar: obterner el perfil + el rol desde nuestra base de datos
-  const fetchProfile = async (userId) => {
+  const fetchProfile = async (userId, authUser) => {
     try {
-      const { data, error } = await supabase
+      const meta = authUser?.user_metadata || {};
+
+      let { data, error } = await supabase
         .from("profiles")
         .select(
           `
@@ -77,11 +74,44 @@ export function AuthProvider({ children }) {
         .eq("id", userId)
         .single();
 
-      if (error) throw error;
+      if (error && error.code === "PGRST116") {
+        const { data: newProfile, error: insertError } = await supabase
+          .from("profiles")
+          .upsert({
+            id: userId,
+            full_name: meta.full_name || "",
+            document_number: meta.document_number || "",
+            role_id: meta.role_id || 6,
+            dependency_id: meta.dependency_id || null,
+          }, { onConflict: "id" })
+          .select(`*, roles (name, permissions), dependencies(name)`)
+          .single();
+
+        if (insertError) throw insertError;
+        data = newProfile;
+      } else if (error) {
+        throw error;
+      }
+
+      if (data && meta.role_id && data.role_id !== meta.role_id) {
+        const { data: updated } = await supabase
+          .from("profiles")
+          .update({ role_id: meta.role_id, dependency_id: meta.dependency_id || data.dependency_id })
+          .eq("id", userId)
+          .select(`*, roles (name, permissions), dependencies(name)`)
+          .single();
+        if (updated) data = updated;
+      }
+
       setProfile(data);
     } catch (err) {
-      console.error("Error cargando perfil", err);
+      console.error("Error cargando perfil:", err?.msg || err?.message || JSON.stringify(err));
       setError("No se pudo cargar el perfil de usuario");
+      if (authUser) {
+        await supabase.auth.signOut();
+      }
+    } finally {
+      setProfileLoaded(true);
     }
   };
 
@@ -96,8 +126,9 @@ export function AuthProvider({ children }) {
       if (error) throw error;
       return { success: true, data };
     } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
+      const msg = err?.message || "Error al iniciar sesión";
+      setError(msg);
+      return { success: false, error: msg };
     }
   };
 
@@ -111,7 +142,8 @@ export function AuthProvider({ children }) {
           data: {
             full_name: userData.full_name,
             document_number: userData.document_number,
-            //El traiger que creamos de SLQ creara automaticamente el perfil
+            role_id: userData.role_id,
+            dependency_id: userData.dependency_id,
           },
         },
       });
@@ -119,16 +151,16 @@ export function AuthProvider({ children }) {
       if (error) throw error;
       return { success: true, data };
     } catch (err) {
-      setError(err.message);
-      return { success: false, error: err.message };
+      const msg = err?.message || "Error al registrar usuario";
+      setError(msg);
+      return { success: false, error: msg };
     }
   };
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      //El estado se limpia automaticamente por onAuthStateChange
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || "Error al cerrar sesión");
     }
   };
 
@@ -147,17 +179,16 @@ export function AuthProvider({ children }) {
     hasRole(["PSICOLOGIA", "ENFERMERIA", "TRABAJO_SOCIAL"]);
   const isAprendiz = () => hasRole("APRENDIZ");
 
-  //valor proporcionado a toda la app
   const value = {
     user,
     profile,
-    loading,
+    loading: initialLoading,
+    profileLoaded,
     error,
     signIn,
     signUp,
     signOut,
-    //helpers RBAC
-    hasRole: hasRole,
+    hasRole,
     isAdmin,
     isCoordination,
     isProfessional,
@@ -166,7 +197,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {!initialLoading && children}
     </AuthContext.Provider>
   );
 }
